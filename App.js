@@ -1,20 +1,44 @@
+import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 
-export default function App() {
+import { TransactionsProvider } from './src/context/TransactionsContext';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import RootNavigator from './src/navigation/RootNavigator';
+
+function AppContent() {
+  const { mode, colors } = useTheme();
+  const base = mode === 'dark' ? DarkTheme : DefaultTheme;
+
+  const navigationTheme = {
+    ...base,
+    colors: {
+      ...base.colors,
+      background: colors.void,
+      card: colors.panel,
+      border: colors.hairline,
+      text: colors.bone,
+      primary: colors.amber,
+    },
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer theme={navigationTheme}>
+      <RootNavigator />
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <TransactionsProvider>
+          <AppContent />
+        </TransactionsProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
